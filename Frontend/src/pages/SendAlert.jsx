@@ -40,82 +40,59 @@ const SendAlert = () => {
   };
 
   return (
-    <div>
-      <h2>Send Emergency Alert</h2>
+    <div className="card p-4 shadow">
+      <h3 className="mb-3">Send Emergency Alert</h3>
 
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name</label>
-          <br />
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Your name"
-          />
-        </div>
-        <br />
+        <input
+          className="form-control mb-3"
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Your name"
+        />
 
-        <div>
-          <label>Phone</label>
-          <br />
-          <input
-            type="text"
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            placeholder="10 digit phone number"
-          />
-        </div>
-        <br />
+        <input
+          className="form-control mb-3"
+          type="text"
+          name="phone"
+          value={form.phone}
+          onChange={handleChange}
+          placeholder="Phone number"
+        />
 
-        <div>
-          <label>Location</label>
-          <br />
-          <input
-            type="text"
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            placeholder="Your location"
-          />
-        </div>
-        <br />
+        <input
+          className="form-control mb-3"
+          type="text"
+          name="location"
+          value={form.location}
+          onChange={handleChange}
+          placeholder="Location"
+        />
 
-        <div>
-          <label>Emergency Message</label>
-          <br />
-          <textarea
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            placeholder="Describe your emergency..."
-            rows={4}
-            cols={40}
-          />
-        </div>
-        <br />
+        <textarea
+          className="form-control mb-3"
+          name="message"
+          value={form.message}
+          onChange={handleChange}
+          placeholder="Describe emergency..."
+          rows={3}
+        />
 
-        <button type="submit" disabled={loading}>
+        <button className="btn btn-danger w-100" type="submit">
           {loading ? "Sending..." : "Send Alert"}
         </button>
       </form>
 
       {response && (
-        <div>
-          <h4>Alert Sent Successfully!</h4>
-          <p>Alert ID: {response.data.alertId}</p>
-          <p>Urgency: {response.data.urgency}</p>
-          <p>Redirecting to dashboard...</p>
+        <div className="alert alert-success mt-3">
+          Alert Sent. ID: {response.data.alertId}
         </div>
       )}
 
       {error && (
-        <div>
-          <h4>Error:</h4>
-          <pre>{JSON.stringify(error, null, 2)}</pre>
-        </div>
+        <div className="alert alert-danger mt-3">{JSON.stringify(error)}</div>
       )}
     </div>
   );

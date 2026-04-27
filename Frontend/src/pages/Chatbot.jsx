@@ -21,13 +21,27 @@ const Chatbot = () => {
 
     try {
       const data = await sendMessage(input);
+
+      if (!data || !data.reply) {
+        throw new Error("No response");
+      }
+
       const botMessage = { role: "bot", text: data.reply };
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", text: "Something went wrong. Try again." },
-      ]);
+      let errorMessage =
+        "External API limit is reached. Please try again later.";
+
+      if (
+        err.response?.status === 429 ||
+        err.message?.toLowerCase().includes("limit")
+      ) {
+        errorMessage = "External API limit is reached. Please try again later.";
+      } else if (err.response?.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      }
+
+      setMessages((prev) => [...prev, { role: "bot", text: errorMessage }]);
     } finally {
       setLoading(false);
     }
@@ -38,33 +52,44 @@ const Chatbot = () => {
   };
 
   return (
-    <div>
-      <h2>HelpBot — Safety Assistant</h2>
+    <div className="card shadow p-3">
+      <h4 className="mb-3">HelpBot</h4>
 
       <div
+        className="border rounded p-3 mb-3"
+        style={{ height: "300px", overflowY: "auto" }}
       >
         {messages.map((msg, index) => (
-          <div key={index}>
-            <b>{msg.role === "user" ? "You" : "HelpBot"}:</b> {msg.text}
-            <br />
-            <br />
+          <div
+            key={index}
+            className={`mb-2 ${
+              msg.role === "user" ? "text-end" : "text-start"
+            }`}
+          >
+            <span
+              className={`badge ${
+                msg.role === "user" ? "bg-primary" : "bg-secondary"
+              }`}
+            >
+              {msg.text}
+            </span>
           </div>
         ))}
-        {loading && <p>HelpBot is typing...</p>}
+        {loading && <p>Typing...</p>}
       </div>
 
-      <br />
-
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyPress={handleKeyPress}
-        placeholder="Ask a safety question..."
-      />
-      <button onClick={handleSend} disabled={loading}>
-        Send
-      </button>
+      <div className="input-group">
+        <input
+          className="form-control"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Ask something..."
+        />
+        <button className="btn btn-dark" onClick={handleSend}>
+          Send
+        </button>
+      </div>
     </div>
   );
 };

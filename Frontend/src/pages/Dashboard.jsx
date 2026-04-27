@@ -18,7 +18,6 @@ const Dashboard = () => {
       const activeFilters = {};
       if (filters.urgency) activeFilters.urgency = filters.urgency;
       if (filters.status) activeFilters.status = filters.status;
-
       const data = await getAlerts(activeFilters);
       setAlerts(data.data);
     } catch (err) {
@@ -60,81 +59,104 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h2>Emergency Alerts Dashboard</h2>
+      <h2 className="mb-4">Emergency Alerts Dashboard</h2>
 
-      <div>
-        <label>Filter by Urgency: </label>
-        <select
-          value={filters.urgency}
-          onChange={(e) => setFilters({ ...filters, urgency: e.target.value })}
-        >
-          <option value="">All</option>
-          <option value="HIGH">HIGH</option>
-          <option value="MEDIUM">MEDIUM</option>
-          <option value="LOW">LOW</option>
-        </select>
-        &nbsp;&nbsp;
-        <label>Filter by Status: </label>
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-        >
-          <option value="">All</option>
-          <option value="active">Active</option>
-          <option value="resolved">Resolved</option>
-        </select>
-        &nbsp;&nbsp;
-        <button onClick={fetchAlerts}>Refresh</button>
+      <div className="row mb-3">
+        <div className="col-md-3">
+          <select
+            className="form-select"
+            value={filters.urgency}
+            onChange={(e) =>
+              setFilters({ ...filters, urgency: e.target.value })
+            }
+          >
+            <option value="">All Urgency</option>
+            <option value="HIGH">HIGH</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="LOW">LOW</option>
+          </select>
+        </div>
+
+        <div className="col-md-3">
+          <select
+            className="form-select"
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+          >
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+
+        <div className="col-md-2">
+          <button className="btn btn-primary w-100" onClick={fetchAlerts}>
+            Refresh
+          </button>
+        </div>
       </div>
 
-      <br />
+      {loading && <div className="alert alert-info">Loading alerts...</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-      {loading && <p>Loading alerts...</p>}
-
-      {error && <p>{error}</p>}
-
-      {!loading && <p>Total Alerts: {alerts.length}</p>}
-
-      {!loading && alerts.length === 0 && <p>No alerts found</p>}
+      {!loading && alerts.length === 0 && (
+        <div className="alert alert-warning">No alerts found</div>
+      )}
 
       {!loading && alerts.length > 0 && (
-        <table border="1" cellPadding="8" cellSpacing="0">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Location</th>
-              <th>Message</th>
-              <th>Urgency</th>
-              <th>Status</th>
-              <th>Created At</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {alerts.map((alert) => (
-              <tr key={alert._id}>
-                <td>{alert.name}</td>
-                <td>{alert.phone}</td>
-                <td>{alert.location}</td>
-                <td>{alert.message}</td>
-                <td>{alert.urgency}</td>
-                <td>{alert.classifiedBy}</td>
-                <td>{alert.status}</td>
-                <td>{new Date(alert.createdAt).toLocaleString()}</td>
-                <td>
-                  {alert.status === "active" ? (
-                    <button onClick={() => handleResolve(alert._id)}>
-                      Resolve
-                    </button>
-                  ) : (
-                    "Resolved"
-                  )}
-                </td>
+        <div className="table-responsive">
+          <table className="table table-striped table-bordered">
+            <thead className="table-dark">
+              <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th>Message</th>
+                <th>Urgency</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {alerts.map((alert) => (
+                <tr key={alert._id}>
+                  <td>{alert.name}</td>
+                  <td>{alert.phone}</td>
+                  <td>{alert.location}</td>
+                  <td>{alert.message}</td>
+                  <td>
+                    <span
+                      className={`badge bg-${
+                        alert.urgency === "HIGH"
+                          ? "danger"
+                          : alert.urgency === "MEDIUM"
+                            ? "warning"
+                            : "success"
+                      }`}
+                    >
+                      {alert.urgency}
+                    </span>
+                  </td>
+                  <td>{alert.status}</td>
+                  <td>{new Date(alert.createdAt).toLocaleString()}</td>
+                  <td>
+                    {alert.status === "active" ? (
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => handleResolve(alert._id)}
+                      >
+                        Resolve
+                      </button>
+                    ) : (
+                      <span className="text-success">Resolved</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
