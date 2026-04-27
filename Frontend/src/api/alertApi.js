@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api/alerts";
+// const BASE_URL = "https://emergency-alert-system-v2lb.onrender.com/api/alerts";
+
+const BASE_URL = "https://emergency-alert-system-v2lb.onrender.com/api/alerts";
+
 
 export const sendAlert = async (data) => {
   const response = await axios.post(`${BASE_URL}/send`, data);
